@@ -31,14 +31,26 @@ const data = [
         'c': 'Wan Shi Tong',
         'd': 'Hei Bai',
         answer: 'c'
+    },
+    {
+        question: 'What Breed of Animal is Flopsie?',
+        'a': 'Goat Gorilla',
+        'b': 'Liger',
+        'c': 'Tigerdillo',
+        'd': 'Unkown',
+        answer: 'a'
     }
 ]
 
+// State
 let currentQuestion = 0;
 let score = 0;
 let quiz_ended = false;
 
+// DOM Elements
+const list = document.getElementById('list');
 const quiz_answers = document.getElementsByName('answer');
+const quiz_heading_container = document.querySelector('.heading');
 const submit_btn = document.querySelector('[type="submit"]');
 const question = document.querySelector('.question');
 const choice_a = document.querySelector('[for= "a"]');
@@ -46,10 +58,16 @@ const choice_b = document.querySelector('[for= "b"]');
 const choice_c = document.querySelector('[for= "c"]');
 const choice_d = document.querySelector('[for= "d"]');
 
-function loadQuiz() {
+// Functions
+const checkAnswer = (choice) => {
+    return choice.id === data[currentQuestion].answer
+}
+
+const loadQuiz = () => {
     if (currentQuestion === data.length) {
         alert('You have finished the quiz!');
         quiz_ended = true;
+        display_score();
         return;
     }
     else {
@@ -62,15 +80,37 @@ function loadQuiz() {
         return;
     }
 }
-loadQuiz()
 
+const restart_quiz = () => {
+    score = 0;
+    currentQuestion = 0;
+    quiz_ended = false;
+    question.classList.remove('space')
+    list.classList.remove('hide');
+    submit_btn.textContent = 'Submit';
+    loadQuiz();
+}
+
+const display_score = () => {
+    question.textContent = `
+    You scored a grand total of ${score} out 
+    of ${data.length} questions correct`;
+    question.classList.add('space')
+    submit_btn.textContent = 'Play Again!';
+    list.classList.add('hide');
+    return;
+}
+
+
+loadQuiz();
+
+// Submit answer / Next question event listener
 submit_btn.addEventListener('click', (e) => {
     if (!quiz_ended) {
         e.preventDefault();
         quiz_answers.forEach(choice => {
             if (choice.checked) {
-                if (choice.id === data[currentQuestion].answer) {
-                    console.log('😫')
+                if (checkAnswer(choice)) {
                     score++;
                 }
                 currentQuestion++;
@@ -80,6 +120,7 @@ submit_btn.addEventListener('click', (e) => {
         });
     } else {
         e.preventDefault();
+        restart_quiz();
         return;
     }
 })
